@@ -1,2 +1,145 @@
-<H1>helloWorld</H1>
-<P>helloWorld</P>
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- HEAD -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1357/1357615.png" type="image/x-icon">
+  <title>메뉴생성기</title>
+  
+  <style>
+    input {
+      margin-bottom: 10px;
+      margin-right: 10px;
+      min-width: 20px;
+    }
+
+    #outputContainer {
+      margin-top: 20px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+
+<!-- BODY -->
+<body>
+  <form id="inputForm">
+    <h2>메뉴 생성기</h2>
+    <div id="inputContainer">
+      <input type="text" class="input" oninput="handleInput()" onkeydown="handleTab()" />
+      <input type="text" class="input" oninput="handleInput()" onkeydown="handleTab()" />
+    </div>
+
+  </form>
+  <br>
+  <div id="outputContainer"></div>
+
+  <br>
+  <button id="copyButton">Copy</button>
+  <br><br>
+  <textarea style="width: 600px; height: 150px;" placeholder="여기서 복사 결과를 확인해 보세요"></textarea>
+  <br><br><br><br>
+  <hr style="width: 600px; margin-left: 0;">
+  <h5>업데이트 내역</h5>
+  <!-- <p style="width: 600px; height: 150px;"></p> -->
+  <li style="font-size: 14px;">파비콘 추가 </li>
+  <li style="font-size: 14px;">자동 포커스 : 페이지 로딩 후 첫 칸 포커스</li>
+  <li style="font-size: 14px;">단축키 추가 : ALT+Q로 입력된 값 복사 </li>
+  
+
+  <!-- SCRIPT -->
+  <script>
+    const inputForm = document.getElementById('inputForm');
+    const inputContainer = document.getElementById('inputContainer');
+    const outputContainer = document.getElementById('outputContainer');
+    const copyButton = document.getElementById('copyButton');
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      const firstInput = document.querySelector('.input');
+      if (firstInput) {
+        firstInput.focus();
+      }
+    });
+
+    // Alt + C 조합 감지
+    document.addEventListener('keydown', function(event) {
+      if (event.altKey && event.key === 'q') {
+        copyText();
+      }
+    });
+
+
+    function handleTab(event) {
+      const inputs = inputForm.querySelectorAll('.input');
+      if (event.key === 'Tab' && !event.shiftKey) {
+        const currentIndex = Array.from(inputs).indexOf(event.target);
+        if (currentIndex === inputs.length - 1) {
+          event.preventDefault();
+          inputs[0].focus();
+        }
+      }
+    }
+
+    function handleInput() {
+      const inputs = inputForm.querySelectorAll('.input');
+      const lastIndex = inputs.length - 1;
+
+      if (
+        lastIndex > 0 &&
+        inputs[lastIndex - 1].value === '' &&
+        inputs[lastIndex].value === ''
+      ) {
+        inputContainer.removeChild(inputs[lastIndex]);
+      } else if (
+        lastIndex === inputs.length - 1 &&
+        inputs[lastIndex].value !== ''
+      ) {
+        const newInput = createInput();
+        inputContainer.appendChild(newInput);
+      }
+
+      updateOutput();
+    }
+
+    function createInput() {
+      const newInput = document.createElement('input');
+      newInput.type = 'text';
+      newInput.className = 'input';
+      newInput.oninput = handleInput;
+      newInput.onkeydown = handleTab;
+      return newInput;
+    }
+
+    function updateOutput() {
+      copyButton.textContent = 'Copy';
+      copyButton.addEventListener('click', () => {
+        copyText();
+      });
+    }
+
+    function copyText () {
+      const inputs = inputForm.querySelectorAll('.input');
+      let outputText = '';
+      for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value.trim() !== '') {
+          outputText += `[${inputs[i].value}]`;
+          if (i < inputs.length - 1 && inputs[i + 1].value.trim() !== '') {
+            outputText += ' - ';
+          }
+        }
+      }
+      copyButton.textContent = 'Copy';
+
+      const copyText = outputText;
+        navigator.clipboard
+          .writeText(copyText)
+          .catch((error) => console.error('Copy failed:', error));
+    }
+
+    updateOutput();
+  </script>
+</body>
+
+</html>
